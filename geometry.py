@@ -11,8 +11,8 @@ def center_angle(angle):
     '''
     compute the equivalent angle between -pi and pi
 
-    Input: - angle: angle to be centered in [rad]
-    Output: - angle: centered angle in [rad]
+    Parameter: - angle: angle to be centered in [rad]
+    Return: - angle: centered angle in [rad]
     '''
     while(angle > math.pi or angle <= - math.pi):
         if(angle > math.pi):
