@@ -134,10 +134,8 @@ class Kalman():
         Return: -      : 
                 -      :  
         '''
-        input = ([0], [0], [0], [vr], [vl])
-        A,G = self.model_update(self, dt, vr, vl)
+        A,G = self.model_update(self)                               # update model matrices
 
-       
         Mu_bar = np.dot(A, self.Mu) + np.dot(self.B, input)         # State (Mu) prediction
         Sigma_bar = np.dot(G, np.dot(self.Sigma, G.T)) + self.Q     # Variance (Sigma) prediction 
 
