@@ -6,6 +6,7 @@ Authors: Benoît Gallois, Jehan Corcelle, Arto Dubuisson, Raphaël Dousson
 import numpy as np
 import math
 
+import constantes as cst
 
 class Kalman():
     def __init__(self, x, y, theta):
@@ -63,8 +64,29 @@ class Kalman():
                             self.r_vr, 
                             self.r_vl])
         
-    def matrices_update(theta, vr, vl):
-        vl = vr
-        vl = 1
+    def matrices_update(self, dt, theta, vr, vl):
+        '''
+        System evolving matrix A matrix and motion model Jacobian G computation
+        (needs to be done at each iteration)
+
+        Inputs: - dt    : delta time, time between two iterations in [s]
+                - theta : robot angle in [rad]
+                - vr    : right wheel velocity in [m/2]
+                - vl    : left wheel velocity in [m/2]
+        Outputs:- A     : updated system evolving matrix
+                - G     : updated motion model Jacobian 
+    
+        '''
+        A = ([1, 0, 0, dt*math.cos(theta)/2  , dt*math.cos(theta)/2],
+             [0, 1, 0, dt*math.sin(theta)/2  , dt*math.sin(theta)/2],
+             [0, 0, 1, dt/(4*cst.WHEELS_DIST), -dt/(4*cst.WHEELS_DIST)],
+             [0, 0, 0, 0                     , 0],
+             [0, 0, 0, 0                     , 0])
+        
+        G = A + np.diag([0,0,0,1,1])
+        G[0, 2] = dt*math.sin(theta)*(vr+vl)/2
+        G[1, 2] = -dt*math.cos(theta)*(vr+vl)/2
+
+        return A,G
         
 
