@@ -8,10 +8,17 @@ import math
 
 
 class Kalman():
-    def __init__(self):
+    def __init__(self, x, y, theta):
         '''
         Initialization of the Kalman class
         '''
+        # initial position given by the camera
+        self.x = x
+        self.y = y
+        self.theta = theta
+        self.vr = 0     # at initialization the robot is not moving
+        self.vl = 0
+
         # state noise variances (experimental values)
         self.q_x     = 0
         self.q_y     = 0
@@ -27,13 +34,13 @@ class Kalman():
                   [0, 1])
         
         # state noise matrices (we assume that the noises are independent for simplicity)
-        self.Q_nc = np.diag([self.q_vr],    # no camera
-                            [self.q_vl])
-        self.Q_wc = np.diag([self.q_x],     # with camera
-                            [self.q_y],
-                            [self.q_theta],
-                            [self.q_vr], 
-                            [self.q_vl])
+        self.Q_nc = np.diag([self.q_vr,    # no camera
+                            self.q_vl])
+        self.Q_wc = np.diag([self.q_x,     # with camera
+                            self.q_y,
+                            self.q_theta,
+                            self.q_vr, 
+                            self.q_vl])
 
         # measurement noise variances (experimental values)
         self.r_x     = 0
@@ -48,14 +55,16 @@ class Kalman():
         self.H_wc = np.diag(np.ones(5)) # with camera
 
         # measurements noise matrices (we assume that the noises are independent for simplicity)
-        self.Q_nc = np.diag([self.r_vr],    # no camera
-                            [self.r_vl])
-        self.Q_wc = np.diag([self.r_x],     # with camera
-                            [self.r_y],
-                            [self.r_theta],
-                            [self.r_vr], 
-                            [self.r_vl])
+        self.R_nc = np.diag([self.r_vr,    # no camera
+                            self.r_vl])
+        self.R_wc = np.diag([self.r_x,     # with camera
+                            self.r_y,
+                            self.r_theta,
+                            self.r_vr, 
+                            self.r_vl])
         
-
+    def matrices_update(theta, vr, vl):
+        vl = vr
+        vl = 1
         
 
