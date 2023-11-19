@@ -22,21 +22,21 @@ class Kalman():
                 - theta : initial angle given by the camera in [rad]
         '''
         # time interval between two iterations
-        self.dt = 0
+        self.dt = 0.0
 
         # state vector, initial position and angle given by the camera
         self.Mu = np.array([[x],     # x position
                             [y],      # y position
                             [theta],  # angle
-                            [0],      # vr, right wheel velocity: at initialization the robot is not moving
-                            [0]])     # vl, left wheel velocity : at initialization the robot is not moving
+                            [0.0],      # vr, right wheel velocity: at initialization the robot is not moving
+                            [0.0]])     # vl, left wheel velocity : at initialization the robot is not moving
 
         # state noise variances (experimental values)
         self.q_x     = 0.1
         self.q_y     = 0.1 
         self.q_theta = 0.1
-        self.q_vr    = 0.1    # we assume that the speed variance is half caused by measurement
-        self.q_vl    = 0.1    # and half by perturbation as seen in the exercise 8
+        self.q_vr    = 0.01    # we assume that the speed variance is half caused by measurement
+        self.q_vl    = 0.01    # and half by perturbation as seen in the exercise 8
 
         # covariance matrix of state, with initial position noise variance
         self.Sigma = np.diag([self.q_x,
@@ -60,8 +60,8 @@ class Kalman():
         self.y = np.array([[x],      # x position
                            [y],      # y position
                            [theta],  # angle
-                           [0],      # vr, right wheel velocity: at initialization the robot is not moving
-                           [0]])     # vl, left wheel velocity : at initialization the robot is not moving
+                           [0.0],      # vr, right wheel velocity: at initialization the robot is not moving
+                           [0.0]])     # vl, left wheel velocity : at initialization the robot is not moving
         
         # information if position given by the camera or not
         self.position_camera = True     # at initialization the camera gives the robot position
@@ -147,6 +147,8 @@ class Kalman():
                           [self.Mu[4][0]]])
 
         Mu_bar = np.dot(A, self.Mu) + np.dot(self.B, input)         # State (Mu) prediction
+        print("Mu_bar")
+        print(Mu_bar)
         Sigma_bar = np.dot(G, np.dot(self.Sigma, G.T)) + self.Q     # Variance (Sigma) prediction 
 
         if(not self.position_camera):                               # measurements without camera (only wheels speed)
@@ -160,7 +162,8 @@ class Kalman():
             measurement = self.y
             H = np.eye(5)                                           # measurement model matrix
             R = np.diag([self.r_x, self.r_y, self.r_theta, self.r_vr, self.r_vl])   # measurements noise matrix
-        
+        print("measurement")
+        print(measurement)
         innovation = measurement - np.dot(H, Mu_bar)
         S = np.dot(H, np.dot(Sigma_bar, H.T)) + R                   # innovation variance
         K = np.dot(Sigma_bar, np.dot(H.T, np.linalg.inv(S)))        # optimal gain
