@@ -36,8 +36,8 @@ for iteration in range(max_iter):
         Kfilter.measurement_position(state_x, state_y, state_theta)
         state_vr = math.sqrt(2)
         state_vl = math.sqrt(2)
-        #state_vr = 1
-        #state_vl = 1
+        # state_vr = 1
+        # state_vl = 1
         print("camera")
 
     Kfilter.Kalman_filter()
