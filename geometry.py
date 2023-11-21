@@ -26,8 +26,8 @@ def arctan(x, y):
     '''
     compute the arctangent from x over y
 
-    Parameter: - x: adjacent in [m]
-               - y: opposite in [m]
+    Parameter: - x: adjacent in [mm]
+               - y: opposite in [mm]
     Return: - angle: angle between -pi and pi in [rad]
     '''
     if(y == 0):         # avoid division by 0

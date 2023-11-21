@@ -17,8 +17,8 @@ class Kalman():
         '''
         Initialization of the Kalman class
 
-        Return: - x     : initial x position given by the camera in [m]
-                - y     : initial y position given by the camera in [m]
+        Return: - x     : initial x position given by the camera in [mm]
+                - y     : initial y position given by the camera in [mm]
                 - theta : initial angle given by the camera in [rad]
         '''
         # time interval between two iterations
@@ -35,8 +35,8 @@ class Kalman():
         self.q_x     = 0.1
         self.q_y     = 0.1 
         self.q_theta = 0.1
-        self.q_vr    = 0.01    # we assume that the speed variance is half caused by measurement
-        self.q_vl    = 0.01    # and half by perturbation as seen in the exercise 8
+        self.q_vr    = 10.2    # we assume that the speed variance is half caused by measurement
+        self.q_vl    = 10.2    # and half by perturbation as seen in the exercise 8
 
         # covariance matrix of state, with initial position noise variance
         self.Sigma = np.diag([self.q_x,
@@ -86,8 +86,8 @@ class Kalman():
         '''
         update of the measurement of the wheels speed
 
-        Parameter: - vr    : right wheel velocity in [m/2]
-                   - vl    : left wheel velocity in [m/2]
+        Parameter: - vr    : right wheel velocity in [mm/s]
+                   - vl    : left wheel velocity in [mm/s]
         '''
         self.y[3][0] = vr
         self.y[4][0] = vl
@@ -96,8 +96,8 @@ class Kalman():
         '''
         update of the measurement of the position
 
-        Parameter: - x     : x position in [m]
-                   - y     : y position in [m]
+        Parameter: - x     : x position in [mm]
+                   - y     : y position in [mm]
                    - theta : angle in [rad]
         '''
         self.y[0][0] = x
@@ -114,8 +114,8 @@ class Kalman():
                 - G     : updated motion model Jacobian 
         '''
         theta = self.Mu[2][0]       # angle in [rad]
-        vr = self.Mu[3][0]          # right wheel velocity in [m/2]
-        vl = self.Mu[4][0]          # left  wheel velocity in [m/2]
+        vr = self.Mu[3][0]          # right wheel velocity in [mm/s]
+        vl = self.Mu[4][0]          # left  wheel velocity in [mm/s]
 
         A = np.array([[1, 0, 0, self.dt*math.cos(theta)/2  , self.dt*math.cos(theta)/2   ],
                       [0, 1, 0, self.dt*math.sin(theta)/2  , self.dt*math.sin(theta)/2   ],
@@ -133,10 +133,10 @@ class Kalman():
         '''
         Kalman filter implementation, system state and variance update
 
-        Parameter: - vr    : input right wheel velocity in [m/2]
-                   - vl    : input left wheel velocity in [m/2]
-                   - x     : input x position given by the camera in [m]
-                   - y     : input y position given by the camera in [m]
+        Parameter: - vr    : input right wheel velocity in [mm/s]
+                   - vl    : input left wheel velocity in [mm/s]
+                   - x     : input x position  given by the camera in [mm]
+                   - y     : input y position given by the camera in [mm]
                    - theta : input angle given by the camera in [rad]
 
         Return: -      : 

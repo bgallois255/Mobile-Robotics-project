@@ -17,10 +17,12 @@ state_vl = 0
 Kfilter = eKf.Kalman(state_x,state_y,state_theta)         #Attention, initialiser Kfilter avec x,y,theta donné par la caméra
                                                           # sinon le filtre met bcp de temps à s'adapter à sa position réelle
 max_iter = 12
-x1 = np.zeros(max_iter)
-y1 = np.zeros(max_iter)
-x2 = np.zeros(max_iter)
-y2 = np.zeros(max_iter)
+max_iter2 = 12
+#store real vs filtered position
+x1 = np.zeros(max_iter+max_iter2)
+y1 = np.zeros(max_iter+max_iter2)
+x2 = np.zeros(max_iter+max_iter2)
+y2 = np.zeros(max_iter+max_iter2)
 
 for iteration in range(max_iter):
     print(iteration)
@@ -32,7 +34,7 @@ for iteration in range(max_iter):
 
     Kfilter.dt_update(dt)
     Kfilter.measurement_wheels(state_vr, state_vl)
-    if(iteration % 3 == 0):
+    if(iteration % 4 == 0):
         Kfilter.measurement_position(state_x, state_y, state_theta)
         state_vr = math.sqrt(2)
         state_vl = math.sqrt(2)
@@ -47,8 +49,44 @@ for iteration in range(max_iter):
 
     state_x += 1
     state_y += 1
+    state_theta = math.pi / 4.0
 
+state_vr = 1
+state_vl = 1
+state_theta = 0
+
+for iteration in range(max_iter2):
+    iter = iteration + max_iter
+
+    print(iter)
+    print("Mu")  
+    print(Kfilter.Mu)
     
+    x1[iter] = state_x
+    y1[iter] = state_y
+
+    Kfilter.dt_update(dt)
+    Kfilter.measurement_wheels(state_vr, state_vl)
+    if(iter % 4 == 0):
+        Kfilter.measurement_position(state_x, state_y, state_theta)
+        # state_vr = math.sqrt(2)
+        # state_vl = math.sqrt(2)
+        # state_vr = 1
+        # state_vl = 1
+        print("camera")
+
+    Kfilter.Kalman_filter()
+
+    x2[iter] = Kfilter.Mu[0][0]
+    y2[iter] = Kfilter.Mu[1][0]
+
+    state_x += 1
+    state_y += 0
+    state_theta = 0.0
+
+
+
+
 # Plotting the points
 plt.scatter(x1, y1, label=' ', color='blue')
 plt.scatter(x2, y2, label='Set 2', color='red')
