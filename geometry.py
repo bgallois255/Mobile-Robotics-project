@@ -5,8 +5,6 @@ Authors: Benoît Gallois, Jehan Corcelle, Arto Dubuisson, Raphaël Dousson
 '''
 import math
 
-# not needed yet, but maybe later if need of acos or asin!!
-
 def center_angle(angle):
     '''
     compute the equivalent angle between -pi and pi

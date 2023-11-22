@@ -138,9 +138,6 @@ class Kalman():
                    - x     : input x position  given by the camera in [mm]
                    - y     : input y position given by the camera in [mm]
                    - theta : input angle given by the camera in [rad]
-
-        Return: -      : 
-                -      :  
         '''
         A,G = self.model_update()                                   # update model matrices
         input = np.array([[self.Mu[3][0]],                          # input = vr, vl

@@ -34,7 +34,7 @@ for iteration in range(max_iter):
 
     Kfilter.dt_update(dt)
     Kfilter.measurement_wheels(state_vr, state_vl)
-    if(iteration % 4 == 0):
+    if(iteration % 8 == 0):
         Kfilter.measurement_position(state_x, state_y, state_theta)
         state_vr = math.sqrt(2)
         state_vl = math.sqrt(2)
@@ -67,7 +67,7 @@ for iteration in range(max_iter2):
 
     Kfilter.dt_update(dt)
     Kfilter.measurement_wheels(state_vr, state_vl)
-    if(iter % 4 == 0):
+    if(iter % 8 == 0):
         Kfilter.measurement_position(state_x, state_y, state_theta)
         # state_vr = math.sqrt(2)
         # state_vl = math.sqrt(2)
