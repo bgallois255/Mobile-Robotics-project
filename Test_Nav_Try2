@@ -1,0 +1,62 @@
+##sur ce code, tous les capteurs sont integrés. Mais il faut faire des "any() , "all()" et "max()", mais mon compilateur avec python vers aseba ne le comprend pas
+## j'ai cru comprendre qu'on utilisais pas cette façon de coder donc je le laisse comme ça.... à check
+
+%%run_python
+
+speed0 = 100       # nominal speed
+speedGain = 2      # gain used with ground gradient
+obstThrL = 10      # low obstacle threshold to switch state 1->0
+obstThrH = 20      # high obstacle threshold to switch state 0->1
+obstSpeedGain = 5  # /100 (actual gain: 5/100=0.05)
+
+state = 1          # 0=gradient, 1=obstacle avoidance
+obst = [0, 0, 0, 0, 0]  # measurements from left and right prox sensors
+
+timer_period[0] = 10   # 10ms sampling time
+
+        
+
+@onevent 
+def timer0():
+    global prox_horizontal, motor_left_target, motor_right_target, state, obst, obstThrH, obstThrL, obstSpeedGain, speed0, speedGain 
+
+    # acquisition from the proximity sensors to detect obstacles
+    obst = [prox_horizontal[0],prox_horizontal[1], prox_horizontal[2], prox_horizontal[3], prox_horizontal[4]]
+        # tdmclient does not support yet multiple and/or in if statements:
+    # Switch from goal tracking to obstacle avoidance if obstacle detected
+    if state == 0 and any(value > obstThrL for value in obst):
+        state = 1
+    # Switch from obstacle avoidance to goal tracking if obstacle got unseen
+    elif state == 1 and all(value < obstThrL for value in obst):
+        state = 0
+
+    if  state == 0 :
+        # goal tracking: turn toward the goal
+        leds_top = [0,0,0]
+        motor_left_target = 50
+        motor_right_target = 50
+    else:
+        # Obstacle avoidance: accelerate wheel near obstacle
+        max_obstacle_index = obst.index(max(obst))  # Index of the maximum value in obst
+
+        # Adjust motor targets based on the sensor with the maximum value
+        if max_obstacle_index == 0:
+            # Turn to the right at medium speed if left sensor detects obstacle
+            motor_left_target = speed0 + obstSpeedGain * (obst[0] // 100)
+            motor_right_target = speed0 - obstSpeedGain * (obst[0] // 100)
+        elif max_obstacle_index == 1:
+            # Turn to the right at high speed if middle-right sensor detects obstacle
+            motor_left_target = speed0 + obstSpeedGain2 * (obst[1] // 100)
+            motor_right_target = speed0 - obstSpeedGain2 * (obst[1] // 100)
+        elif max_obstacle_index == 2:
+            # Turn to the right at high speed if middle-left sensor detects obstacle
+            motor_left_target = speed0 + obstSpeedGain2 * (obst[2] // 100)
+            motor_right_target = speed0 - obstSpeedGain2 * (obst[2] // 100)
+        elif max_obstacle_index == 3:
+            # Turn to the right at medium speed if rightmost sensor detects obstacle
+            motor_left_target = speed0 - obstSpeedGain2 * (obst[3] // 100)
+            motor_right_target = speed0 + obstSpeedGain2 * (obst[3] // 100)
+        else:
+            # Handle the case when the last sensor detects an obstacle (you can adjust this logic)
+            motor_left_target = speed0 - obstSpeedGain * (obst[4] // 100)
+            motor_right_target = speed0 + obstSpeedGain * (obst[4] // 100)
