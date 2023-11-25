@@ -1,37 +1,65 @@
 #skeleton of main code
+'''
+main_code_r.py
+skeleton of main code
+Authors: Benoît Gallois, Jehan Corcelle, Arto Dubuisson, Raphaël Dousson
+'''
 
-global_state = 'rotation'
-rotation_ended = False
-translation_ended = False
-local_ended = False
+# import libraries
+import time
+from tdmclient import ClientAsync
 
-### initialisation
-# vision (détection robot, obstacles, goal)
-# global nav
+# import project files
+import constants as cst
+import extended_Kalman_filter as eKf
 
-iter = 0
-while(True):
-    iter = iter + 1
+def main_function():
+    # state variables
+    global_state = 'rotation'
+    rotation_ended = False
+    translation_ended = False
+    local_ended = False
 
-    # vision et gobale toutes les n iterations (i modulo n == 0)
-    
-    # get robot sensor values
-    # test if local (with proximity)
-    # Kalman (with wheel speed and camera position)
+    ### initialisation
+    # vision (détection robot, obstacles, goal)
+    # global nav
 
+    old_time = 0
 
-    if global_state == 'rotation':
-        # call rotation fct
-        if rotation_ended:
-            global_state = 'translation'
+    iter = 0
+    while(True):
+        # vision et gobale toutes les n iterations (i modulo n == 0)
+        
+        # get robot sensor values
+        # test if local (with proximity)
 
-    elif global_state == 'translation':
-        # call translation fct
-        if rotation_ended:
-            global_state = 'rotation'
+        if iter == 0:                   # first time
+            old_time = time.time()
+        dt = time.time() - old_time     # get time difference for Kalman
+        # Kalman (with wheel speed and camera position)
+        old_time = time.time()
 
-    elif global_state == 'local_avoidance':
-        # call local_avoidance fct
-        if local_ended:
-            global_state = 'rotation'
+        if global_state == 'rotation':
+            if rotation_ended:
+                global_state = 'translation'
+            # call rotation fct
 
+        elif global_state == 'translation':
+            # if goal reached
+                # exit
+            if translation_ended:
+                global_state = 'rotation'
+            
+            # if rotation not correct
+                # global_state = 'rotation'
+
+            # call translation fct
+
+        elif global_state == 'local_avoidance':
+            # call local_avoidance fct (= add obstacle on global map and recompute global nav)
+            if local_ended:
+                global_state = 'rotation'
+
+        iter = iter + 1
+
+        

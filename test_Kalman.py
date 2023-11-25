@@ -14,7 +14,7 @@ state_theta = math.pi / 4.0
 state_vr = 0
 state_vl = 0
 
-Kfilter = eKf.Kalman(state_x,state_y,state_theta)         #Attention, initialiser Kfilter avec x,y,theta donné par la caméra
+Kfilter = eKf.Kalman(state_x,state_y,state_theta)         # Attention, initialiser Kfilter avec x,y,theta donné par la caméra
                                                           # sinon le filtre met bcp de temps à s'adapter à sa position réelle
 max_iter = 12
 max_iter2 = 12

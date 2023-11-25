@@ -8,4 +8,5 @@ WHEELS_DIST = 93                        # distance between the wheels of Thymio 
 WHEEL_DIAMETER = 42                     # wheel diameter in [mm]
 WHEEL_RADIUS = WHEEL_DIAMETER / 2       # wheel radius in [mm]
 
+MAX_THYMIO_SPEED = 50                   # thymio speed
 THYMIO_SPEED_TO_MM_PER_S = 0.43478      # thymio speed to mm/s conversion factor (experimental)
