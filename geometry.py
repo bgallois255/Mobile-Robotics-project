@@ -7,7 +7,7 @@ import math
 
 def center_angle(angle):
     '''
-    compute the equivalent angle between -pi and pi
+    compute the equivalent angle between -pi and pi 
 
     Parameter: - angle: angle to be centered in [rad]
     Return: - angle: centered angle in [rad]
