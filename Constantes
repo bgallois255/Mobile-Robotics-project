@@ -1,0 +1,4 @@
+
+Dist_Detect = [13,13,13,13,13]  #distance à laquelle le robot détecte (par rapport au capteur, pour un objet blanc) -> valeurs moyennes
+Vect_detection = [[17, 17], [19, 10], [21, 0], [19, -10], [17, -17]] #vecteurs de detection d'un objet par les 5 capteurs sur le réferentiel du robot par rapport au point entre les 2 roues
+
