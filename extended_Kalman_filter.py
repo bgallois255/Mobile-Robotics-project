@@ -119,7 +119,7 @@ class Kalman():
 
         A = np.array([[1, 0, 0, self.dt*math.cos(theta)/2  , self.dt*math.cos(theta)/2   ],
                       [0, 1, 0, self.dt*math.sin(theta)/2  , self.dt*math.sin(theta)/2   ],
-                      [0, 0, 1, self.dt/(4*cst.WHEELS_DIST), -self.dt/(4*cst.WHEELS_DIST)],
+                      [0, 0, 1, self.dt*18.1818/(4*cst.WHEELS_DIST), -self.dt*18.1818/(4*cst.WHEELS_DIST)],     #*18.1818 test in main_code_r
                       [0, 0, 0, 0                          , 0                           ],
                       [0, 0, 0, 0                          , 0                           ]])
         
@@ -144,8 +144,8 @@ class Kalman():
                           [self.Mu[4][0]]])
 
         Mu_bar = np.dot(A, self.Mu) + np.dot(self.B, input)         # State (Mu) prediction
-        print("Mu_bar")
-        print(Mu_bar)
+        #print("Mu_bar")
+        #print(Mu_bar)
         Sigma_bar = np.dot(G, np.dot(self.Sigma, G.T)) + self.Q     # Variance (Sigma) prediction 
 
         if(not self.position_camera):                               # measurements without camera (only wheels speed)
@@ -159,8 +159,8 @@ class Kalman():
             measurement = self.y
             H = np.eye(5)                                           # measurement model matrix
             R = np.diag([self.r_x, self.r_y, self.r_theta, self.r_vr, self.r_vl])   # measurements noise matrix
-        print("measurement")
-        print(measurement)
+        #print("measurement")
+        #print(measurement)
         innovation = measurement - np.dot(H, Mu_bar)
         S = np.dot(H, np.dot(Sigma_bar, H.T)) + R                   # innovation variance
         K = np.dot(Sigma_bar, np.dot(H.T, np.linalg.inv(S)))        # optimal gain

@@ -12,17 +12,20 @@ from tdmclient import ClientAsync
 # import project files
 import constants as cst
 import extended_Kalman_filter as eKf
+import vision
 
 def main_function():
     # state variables
     global_state = 'rotation'
     rotation_ended = False
     translation_ended = False
-    local_ended = False
 
     ### initialisation
     # vision (détection robot, obstacles, goal)
+    obstacles, goal_centroid, robot_centroid, robot_direction = vision.vision_obstacles_positions()
     # global nav
+    
+
 
     old_time = 0
 
@@ -57,8 +60,8 @@ def main_function():
 
         elif global_state == 'local_avoidance':
             # call local_avoidance fct (= add obstacle on global map and recompute global nav)
-            if local_ended:
-                global_state = 'rotation'
+            
+            global_state = 'rotation'
 
         iter = iter + 1
 
