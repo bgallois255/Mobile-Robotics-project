@@ -35,8 +35,8 @@ class Kalman():
         self.q_x     = 0.1
         self.q_y     = 0.1 
         self.q_theta = 0.1
-        self.q_vr    = 10.2    # we assume that the speed variance is half caused by measurement
-        self.q_vl    = 10.2    # and half by perturbation as seen in the exercise 8
+        self.q_vr    = 8.318/2.0    # we assume that the speed variance is half caused by measurement
+        self.q_vl    = 8.318/2.0    # and half by perturbation as seen in the exercise 8
 
         # covariance matrix of state, with initial position noise variance
         self.Sigma = np.diag([self.q_x,
