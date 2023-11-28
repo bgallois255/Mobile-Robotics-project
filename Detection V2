@@ -1,0 +1,50 @@
+def advance_and_detect(robot_centroid, robot_direction, prox_horizontal, vect_detection):
+    '''
+    @brief   Advances the robot and returns the position of the detected object in the ground reference frame.
+ 
+    @param   robot_centroid      -> List representing the centroid coordinates of the robot
+             robot_direction    -> Tuple representing the direction vector coordinates of the robot
+             prox_horizontal    -> List representing the values reported by the horizontal proximity sensors
+              vect_detection -> List representing the coordinates of the detected object in the robot's reference frame
+
+    @return  object_ground_coords -> List representing the coordinates of the detected object in the ground reference frame, or None if no object is detected
+    '''
+    
+    object_ground_coords = None
+    
+    # Continue advancing until an object is detected
+    while object_ground_coords is None:
+        for sensor_index, distance in enumerate(prox_horizontal):
+            # Check if an object is detected by the sensor
+            if distance > 0:
+                # Calculate object coordinates in the robot's reference frame
+                dobject_robot_coords = vect_detection[sensor_index]
+                
+                # Convert object coordinates to the ground reference frame
+                object_ground_coords = object_position_in_ground_frame(robot_centroid, robot_direction, object_robot_coords)
+                
+                # Print the information about the detected object
+                print(f"Point détecté par le senseur {sensor_index} aux coordonnées {object_ground_coords}")
+                
+                # Break the loop as soon as an object is detected
+                break
+        
+        # If no object is detected, continue advancing (mettre la global nav)
+    
+    return object_ground_coords
+
+
+
+
+
+#Test 
+robot_centroid = np.array([100, 100])  # Example centroid of the robot
+robot_direction = np.array([1, 0])  # Example direction vector of the robot
+prox_horizontal = [10, 0, 0, 0, 0]  # Example sensor values, where the first sensor detects an object
+
+result = advance_and_detect(robot_centroid, robot_direction, prox_horizontal, vect_detection)
+
+if result is not None:
+    print("Final position of the detected object:", result)
+else:
+    print("No object detected during the entire process.")
