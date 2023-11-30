@@ -119,7 +119,7 @@ class Kalman():
 
         A = np.array([[1, 0, 0, self.dt*math.cos(theta)/2  , self.dt*math.cos(theta)/2   ],
                       [0, 1, 0, self.dt*math.sin(theta)/2  , self.dt*math.sin(theta)/2   ],
-                      [0, 0, 1, self.dt*18.1818/(4*cst.WHEELS_DIST), -self.dt*18.1818/(4*cst.WHEELS_DIST)],     #*18.1818 test in main_code_r
+                      [0, 0, 1, self.dt*cst.ROTATION_CORR/(4*cst.WHEELS_DIST), -self.dt*cst.ROTATION_CORR/(4*cst.WHEELS_DIST)],     #*18.1818 test in main_code_r
                       [0, 0, 0, 0                          , 0                           ],
                       [0, 0, 0, 0                          , 0                           ]])
         
