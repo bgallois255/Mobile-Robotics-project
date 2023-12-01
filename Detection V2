@@ -1,4 +1,4 @@
-def object_robot_coordinates(robot_centroid, robot_direction, prox_sensors):
+y_def object_robot_coordinates(robot_centroid, robot_direction, prox_sensors):
     '''
     @brief   Returns the position of the detected object in the robot reference frame.
  
@@ -92,5 +92,6 @@ def safety_zone(center_point):
     
     return corner1, corner2, corner3, corner4
 
+safety_zone = safety_zone(robot_to_ground_coords(object_robot_coordinates(robot_centroid, robot_direction, prox_sensors)))
 
-distances.append([corner1,corner2,corner3,corner4])
+distances.append(safety_zone)
