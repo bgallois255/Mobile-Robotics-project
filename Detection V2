@@ -1,4 +1,7 @@
-y_def object_robot_coordinates(robot_centroid, robot_direction, prox_sensors):
+import numpy as np
+
+
+def object_robot_coordinates(prox_sensors):
     '''
     @brief   Returns the position of the detected object in the robot reference frame.
  
@@ -15,10 +18,10 @@ y_def object_robot_coordinates(robot_centroid, robot_direction, prox_sensors):
     if any(sensor_value > 20 for sensor_value in prox_sensors):
         # Find the index and value of the sensor with the maximum value
         max_sensor_index, max_sensor_value = max(enumerate(prox_sensors), key=lambda x: x[1]) 
-""
-max(..., key=lambda x: x[1]) spécifie une fonction lambda en tant que clé de comparaison pour la fonction max. 
-lambda prend une paire (indice, valeur) et retourne la valeur (x[1]) comme critère de comparaison.
-""      
+        '''
+        max(..., key=lambda x: x[1]) spécifie une fonction lambda en tant que clé de comparaison pour la fonction max. 
+        lambda prend une paire (indice, valeur) et retourne la valeur (x[1]) comme critère de comparaison.
+        '''     
         # Calculate distance and angle based on the sensor index
         distance = (5739 - max_sensor_value) / 339
         angle = [40, 25, 0, -25, -40][max_sensor_index]
@@ -29,9 +32,6 @@ lambda prend une paire (indice, valeur) et retourne la valeur (x[1]) comme crit�
             distance * np.sin(np.radians(angle))
         ]
 
-        #object_ground_coords = robot_to_ground_coords(robot_centroid, robot_direction,object_robot_coords)
-
-        #return object_ground_coords
         return object_robot_coords
     
     # Return None if no object is detected
@@ -39,10 +39,6 @@ lambda prend une paire (indice, valeur) et retourne la valeur (x[1]) comme crit�
 
 
 
-
-
-
---------------------------------------------------------------------
 
 def robot_to_ground_coords(robot_centroid, robot_direction, object_robot_coords):
     '''
@@ -70,7 +66,7 @@ def robot_to_ground_coords(robot_centroid, robot_direction, object_robot_coords)
     
     return object_ground_coords
 
-----------------------------------------------------
+
 
 def safety_zone(center_point):
     '''
@@ -85,13 +81,18 @@ def safety_zone(center_point):
     distance = 120
     
     # Calculate coordinates of the four corners
-    corner1 = [center_point[0] + distance, center_point[1] + distance]
-    corner2 = [center_point[0] + distance, center_point[1] - distance]
-    corner3 = [center_point[0] - distance, center_point[1] - distance]
-    corner4 = [center_point[0] - distance, center_point[1] + distance]
+    corner1 = (center_point[0] + distance, center_point[1] + distance)
+    corner2 = (center_point[0] + distance, center_point[1] - distance)
+    corner3 = (center_point[0] - distance, center_point[1] - distance)
+    corner4 = (center_point[0] - distance, center_point[1] + distance)
     
-    return corner1, corner2, corner3, corner4
+    return [corner1, corner2, corner3, corner4]
 
-safety_zone = safety_zone(robot_to_ground_coords(object_robot_coordinates(robot_centroid, robot_direction, prox_sensors)))
 
-distances.append(safety_zone)
+def local_nav(robot_centroid, robot_direction, prox_sensors):
+    object_robot_coords = object_robot_coordinates(prox_sensors)
+    object_ground_coords = robot_to_ground_coords(robot_centroid, robot_direction, object_robot_coords)
+    Object = safety_zone(object_ground_coords)
+    return Object
+    
+Objets.append(Object)
