@@ -1,4 +1,36 @@
-def advance_and_detect(robot_centroid, robot_direction, prox_horizontal, vect_detection):
+def robot_to_ground_coords(robot_centroid, robot_direction, detected_object_coords):
+    '''
+    @brief   Converts the detected object coordinates from the robot's reference frame to the ground reference frame.
+ 
+    @param   robot_centroid         -> List representing the centroid coordinates of the robot
+             robot_direction       -> Tuple representing the direction vector coordinates of the robot
+             detected_object_coords -> List representing the coordinates of the detected object in the robot's reference frame
+    
+    @return  object_ground_coords  -> List representing the coordinates of the detected object in the ground reference frame
+    '''
+    
+    # Convert robot direction to unit vector
+    robot_direction_unit = robot_direction / np.linalg.norm(robot_direction)
+    
+    # Calculate the vector from the robot centroid to the detected object in the robot's reference frame
+    object_vector_robot_frame = np.array(detected_object_coords)
+    
+    # Transform the vector to the ground reference frame
+    object_vector_ground_frame = object_vector_robot_frame.dot([[robot_direction_unit[0], -robot_direction_unit[1]], 
+                                                                [robot_direction_unit[1], robot_direction_unit[0]]])
+    
+    # Calculate the coordinates of the detected object in the ground reference frame
+    object_ground_coords = robot_centroid + object_vector_ground_frame
+    
+    return object_ground_coords
+
+
+
+
+
+
+
+def advance_and_detect(robot_centroid, robot_direction, prox_horizontal, detected_object_coords):
     '''
     @brief   Advances the robot and returns the position of the detected object in the ground reference frame.
  
@@ -18,7 +50,7 @@ def advance_and_detect(robot_centroid, robot_direction, prox_horizontal, vect_de
             # Check if an object is detected by the sensor
             if distance > 0:
                 # Calculate object coordinates in the robot's reference frame
-                dobject_robot_coords = vect_detection[sensor_index]
+                object_robot_coords = detected_object_coords[sensor_index]
                 
                 # Convert object coordinates to the ground reference frame
                 object_ground_coords = object_position_in_ground_frame(robot_centroid, robot_direction, object_robot_coords)
@@ -33,18 +65,3 @@ def advance_and_detect(robot_centroid, robot_direction, prox_horizontal, vect_de
     
     return object_ground_coords
 
-
-
-
-
-#Test 
-robot_centroid = np.array([100, 100])  # Example centroid of the robot
-robot_direction = np.array([1, 0])  # Example direction vector of the robot
-prox_horizontal = [10, 0, 0, 0, 0]  # Example sensor values, where the first sensor detects an object
-
-result = advance_and_detect(robot_centroid, robot_direction, prox_horizontal, vect_detection)
-
-if result is not None:
-    print("Final position of the detected object:", result)
-else:
-    print("No object detected during the entire process.")
