@@ -1,10 +1,10 @@
-def robot_to_ground_coords(robot_centroid, robot_direction, detected_object_coords):
+def robot_to_ground_coords(robot_centroid, robot_direction, object_robot_coords):
     '''
     @brief   Converts the detected object coordinates from the robot's reference frame to the ground reference frame.
  
     @param   robot_centroid         -> List representing the centroid coordinates of the robot
              robot_direction       -> Tuple representing the direction vector coordinates of the robot
-             detected_object_coords -> List representing the coordinates of the detected object in the robot's reference frame
+             object_robot_coords -> List representing the coordinates of the detected object in the robot's reference frame
     
     @return  object_ground_coords  -> List representing the coordinates of the detected object in the ground reference frame
     '''
@@ -13,7 +13,7 @@ def robot_to_ground_coords(robot_centroid, robot_direction, detected_object_coor
     robot_direction_unit = robot_direction / np.linalg.norm(robot_direction)
     
     # Calculate the vector from the robot centroid to the detected object in the robot's reference frame
-    object_vector_robot_frame = np.array(detected_object_coords)
+    object_vector_robot_frame = np.array(object_robot_coords)
     
     # Transform the vector to the ground reference frame
     object_vector_ground_frame = object_vector_robot_frame.dot([[robot_direction_unit[0], -robot_direction_unit[1]], 
@@ -25,49 +25,43 @@ def robot_to_ground_coords(robot_centroid, robot_direction, detected_object_coor
     return object_ground_coords
 
 ________________________________________________________________________________________________
-def advance_and_detect(robot_centroid, robot_direction, prox_sensors):
+def object_robot_coordinates(robot_centroid, robot_direction, prox_sensors):
     '''
-    @brief   Advances the robot and returns the position of the detected object in the ground reference frame.
+    @brief   Returns the position of the detected object in the robot reference frame.
  
     @param   robot_centroid      -> List representing the centroid coordinates of the robot
              robot_direction    -> Tuple representing the direction vector coordinates of the robot
              prox_sensors       -> List representing the values reported by the proximity sensors
     
-    @return  object_ground_coords -> List representing the coordinates of the detected object in the ground reference frame, or None if no object is detected
+    @return  object_robot_coords -> List representing the coordinates of the detected object in the robot reference frame, or None if no object is detected
+             max_sensor_index   -> Index of the sensor with the maximum value among those that detected an object
+             max_sensor_value   -> Maximum value among the sensors that detected an object
     '''
     
-    object_ground_coords = None
-    
-    # Continue advancing until an object is detected
-    while object_ground_coords is None:
-        for sensor_index, sensor_value in enumerate(prox_sensors):
-            # Check if an object is detected by the sensor
-            if sensor_value > 0:
-                # Calculate distance and angle based on the sensor index
-                distance = (5739 - sensor_value) / 339
-                angle = [40, 25, 0, -25, -40][sensor_index]
-                
-                # Calculate object coordinates in the robot's reference frame
-                detected_object_coords_robot_frame = [
-                    distance * np.cos(np.radians(angle)),
-                    distance * np.sin(np.radians(angle))
-                ]
-                
-                # Convert object coordinates to the ground reference frame
-                object_ground_coords = object_position_in_ground_frame(robot_centroid, robot_direction, detected_object_coords_robot_frame)
-                
-                # Print the information about the detected object
-                print(f"Object detected by sensor {sensor_index} at coordinates {object_ground_coords}")
-                
-                # Break the loop as soon as an object is detected
-                break
+    # Check if any sensor detected an object
+    if any(sensor_value > 20 for sensor_value in prox_sensors):
+        # Find the index and value of the sensor with the maximum value
+        max_sensor_index, max_sensor_value = max(enumerate(prox_sensors), key=lambda x: x[1])
         
-        # If no object is detected, continue advancing (you can replace this with your own advance logic)
-        if object_ground_coords is None:
-            print("No object detected. Continue advancing.")
-            # Add your logic for advancing here
+        # Calculate distance and angle based on the sensor index
+        distance = (5739 - max_sensor_value) / 339
+        angle = [40, 25, 0, -25, -40][max_sensor_index]
+        
+        # Calculate object coordinates in the robot's reference frame
+        object_robot_coords = [
+            distance * np.cos(np.radians(angle)),
+            distance * np.sin(np.radians(angle))
+        ]
+        
+        return object_robot_coords, max_sensor_index, max_sensor_value
     
-    return object_ground_coords
+    # Return None if no object is detected
+    return None, None, None
+
+
+
+
+
 
 --------------------------------------------------------------------
 
