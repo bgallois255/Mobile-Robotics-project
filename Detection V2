@@ -1,3 +1,46 @@
+def object_robot_coordinates(robot_centroid, robot_direction, prox_sensors):
+    '''
+    @brief   Returns the position of the detected object in the robot reference frame.
+ 
+    @param   robot_centroid      -> List representing the centroid coordinates of the robot
+             robot_direction    -> Tuple representing the direction vector coordinates of the robot
+             prox_sensors       -> List representing the values reported by the proximity sensors
+    
+    @return  object_robot_coords -> List representing the coordinates of the detected object in the robot reference frame, or None if no object is detected
+             max_sensor_index   -> Index of the sensor with the maximum value among those that detected an object
+             max_sensor_value   -> Maximum value among the sensors that detected an object
+    '''
+    
+    # Check if any sensor detected an object
+    if any(sensor_value > 20 for sensor_value in prox_sensors):
+        # Find the index and value of the sensor with the maximum value
+        max_sensor_index, max_sensor_value = max(enumerate(prox_sensors), key=lambda x: x[1]) 
+""
+max(..., key=lambda x: x[1]) spécifie une fonction lambda en tant que clé de comparaison pour la fonction max. 
+lambda prend une paire (indice, valeur) et retourne la valeur (x[1]) comme critère de comparaison.
+""      
+        # Calculate distance and angle based on the sensor index
+        distance = (5739 - max_sensor_value) / 339
+        angle = [40, 25, 0, -25, -40][max_sensor_index]
+        
+        # Calculate object coordinates in the robot's reference frame
+        object_robot_coords = [
+            distance * np.cos(np.radians(angle)),
+            distance * np.sin(np.radians(angle))
+        ]
+        
+        return object_robot_coords, max_sensor_index, max_sensor_value
+    
+    # Return None if no object is detected
+    return None, None, None
+
+
+
+
+
+
+--------------------------------------------------------------------
+
 def robot_to_ground_coords(robot_centroid, robot_direction, object_robot_coords):
     '''
     @brief   Converts the detected object coordinates from the robot's reference frame to the ground reference frame.
@@ -24,82 +67,4 @@ def robot_to_ground_coords(robot_centroid, robot_direction, object_robot_coords)
     
     return object_ground_coords
 
-________________________________________________________________________________________________
-def object_robot_coordinates(robot_centroid, robot_direction, prox_sensors):
-    '''
-    @brief   Returns the position of the detected object in the robot reference frame.
- 
-    @param   robot_centroid      -> List representing the centroid coordinates of the robot
-             robot_direction    -> Tuple representing the direction vector coordinates of the robot
-             prox_sensors       -> List representing the values reported by the proximity sensors
-    
-    @return  object_robot_coords -> List representing the coordinates of the detected object in the robot reference frame, or None if no object is detected
-             max_sensor_index   -> Index of the sensor with the maximum value among those that detected an object
-             max_sensor_value   -> Maximum value among the sensors that detected an object
-    '''
-    
-    # Check if any sensor detected an object
-    if any(sensor_value > 20 for sensor_value in prox_sensors):
-        # Find the index and value of the sensor with the maximum value
-        max_sensor_index, max_sensor_value = max(enumerate(prox_sensors), key=lambda x: x[1])
-        
-        # Calculate distance and angle based on the sensor index
-        distance = (5739 - max_sensor_value) / 339
-        angle = [40, 25, 0, -25, -40][max_sensor_index]
-        
-        # Calculate object coordinates in the robot's reference frame
-        object_robot_coords = [
-            distance * np.cos(np.radians(angle)),
-            distance * np.sin(np.radians(angle))
-        ]
-        
-        return object_robot_coords, max_sensor_index, max_sensor_value
-    
-    # Return None if no object is detected
-    return None, None, None
-
-
-
-
-
-
---------------------------------------------------------------------
-
-
-
-
-def advance_and_detect(robot_centroid, robot_direction, prox_horizontal, detected_object_coords):
-    '''
-    @brief   Advances the robot and returns the position of the detected object in the ground reference frame.
- 
-    @param   robot_centroid      -> List representing the centroid coordinates of the robot
-             robot_direction    -> Tuple representing the direction vector coordinates of the robot
-             prox_horizontal    -> List representing the values reported by the horizontal proximity sensors
-              vect_detection -> List representing the coordinates of the detected object in the robot's reference frame
-
-    @return  object_ground_coords -> List representing the coordinates of the detected object in the ground reference frame, or None if no object is detected
-    '''
-    
-    object_ground_coords = None
-    
-    # Continue advancing until an object is detected
-    while object_ground_coords is None:
-        for sensor_index, distance in enumerate(prox_horizontal):
-            # Check if an object is detected by the sensor
-            if distance > 0:
-                # Calculate object coordinates in the robot's reference frame
-                object_robot_coords = detected_object_coords[sensor_index]
-                
-                # Convert object coordinates to the ground reference frame
-                object_ground_coords = object_position_in_ground_frame(robot_centroid, robot_direction, object_robot_coords)
-                
-                # Print the information about the detected object
-                print(f"Point détecté par le senseur {sensor_index} aux coordonnées {object_ground_coords}")
-                
-                # Break the loop as soon as an object is detected
-                break
-        
-        # If no object is detected, continue advancing (mettre la global nav)
-    
-    return object_ground_coords
 
