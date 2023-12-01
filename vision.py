@@ -73,24 +73,6 @@ def calculate_area_centroid(area_coordinates):
     return centroid
 
 
-def draw_annotations(image, obstacles, goal_area, front_robot_area, back_robot_area, robot_centroid, robot_direction):
-    for coords in obstacles:
-        cv2.drawContours(image, [np.array(coords)], 0, (128, 0, 128), -1)  # Violet
-
-    for coords in goal_area:
-        cv2.drawContours(image, [np.array(coords)], 0, (255, 0, 0), -1)  # Blue
-
-    for coords in front_robot_area + back_robot_area:
-        cv2.drawContours(image, [np.array(coords)], 0, (0, 0, 255), -1)  # Red
-
-    cv2.circle(image, tuple(map(int, robot_centroid)), 5, (0, 255, 0), -1)  # Green
-
-    arrow_start = tuple(map(int, robot_centroid))
-    arrow_end = tuple(map(int, np.add(arrow_start, robot_direction)))
-    cv2.arrowedLine(image, arrow_start, arrow_end, (0, 255, 255), 2)  # Yellow
-
-    return image
-
 def vision_obstacles_and_goal():
     cap = cv2.VideoCapture(0)
 
@@ -112,16 +94,6 @@ def vision_obstacles_and_goal():
     goal_area = detect_area(frame, LOWER_RED, UPPER_RED, MARGIN_RED_BLUE_GREEN)
    
     goal_centroid = calculate_area_centroid(goal_area)
-
-    # Create a copy of the frame for annotations
-    annotated_frame = frame.copy()
-
-    # Draw annotations on the frame
-    #annotated_frame = draw_annotations(annotated_frame, obstacles, goal_area, front_robot_area, back_robot_area,
-    #                                    robot_centroid, robot_direction)
-
-    # Display the annotated frame
-    cv2.imshow('Annotated Webcam', annotated_frame)
 
     print(f"Coordonnées obstacles noirs :", obstacles)
     print("Centroid de la goal area :", goal_centroid)
@@ -148,73 +120,13 @@ def vision_robot():
 
     robot_direction, robot_centroid = calculate_robot_direction(front_robot_area, back_robot_area)
 
-    # Create a copy of the frame for annotations
-    annotated_frame = frame.copy()
-
-    # Draw annotations on the frame
-    #annotated_frame = draw_annotations(annotated_frame, obstacles, goal_area, front_robot_area, back_robot_area,
-    #                                    robot_centroid, robot_direction)
-
-    # Display the annotated frame
-    cv2.imshow('Annotated Webcam', annotated_frame)
-
-    #print(f"Coordonnées obstacles noirs :", obstacles)
     print("Vecteur direction du robot :", robot_direction[0])
     print("Centroid du robot :", robot_centroid)
-    #print("Centroid de la goal area :", goal_centroid)
     
     return robot_centroid, robot_direction
 
-def vision_repeated():
-    cap = cv2.VideoCapture(0)
 
-    if not cap.isOpened():
-        print("Erreur: Impossible d'ouvrir la webcam.")
-        return
+#obst, goal = vision_obstacles_and_goal()
 
-    try:
-        while True:
-            ret, frame = cap.read()
-
-            if not ret:
-                print("Erreur: Impossible de capturer l'image.")
-                break
-
-            cv2.imshow('Webcam', frame)
-
-            obstacles = detect_area(frame, LOWER_BLACK, UPPER_BLACK, MARGIN_OBSTACLE)
-            goal_area = detect_area(frame, LOWER_RED, UPPER_RED, MARGIN_RED_BLUE_GREEN)
-            front_robot_area = detect_area(frame, LOWER_BLUE, UPPER_BLUE, MARGIN_RED_BLUE_GREEN)
-            back_robot_area = detect_area(frame, LOWER_GREEN, UPPER_GREEN, MARGIN_RED_BLUE_GREEN)
-
-            robot_direction, robot_centroid = calculate_robot_direction(front_robot_area, back_robot_area)
-
-            goal_centroid = calculate_area_centroid(goal_area)
-
-            # Create a copy of the frame for annotations
-            annotated_frame = frame.copy()
-
-            # Draw annotations on the frame
-            annotated_frame = draw_annotations(annotated_frame, obstacles, goal_area, front_robot_area, back_robot_area,
-                                               robot_centroid, robot_direction)
-
-            # Display the annotated frame
-            cv2.imshow('Annotated Webcam', annotated_frame)
-
-            print(f"Coordonnées obstacles noirs :", obstacles)
-            print("Vecteur direction du robot :", robot_direction[0])
-            print("Centroid du robot :", robot_centroid)
-            print("Centroid de la goal area :", goal_centroid)
-
-            time.sleep(3)
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-    finally:
-        cap.release()
-        cv2.destroyAllWindows()
-
-
-# Call the main function
-#vision_repeated()
+#while True:
+#    robot = vision_robot()
