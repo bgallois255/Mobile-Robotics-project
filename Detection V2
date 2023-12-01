@@ -24,8 +24,52 @@ def robot_to_ground_coords(robot_centroid, robot_direction, detected_object_coor
     
     return object_ground_coords
 
+________________________________________________________________________________________________
+def advance_and_detect(robot_centroid, robot_direction, prox_sensors):
+    '''
+    @brief   Advances the robot and returns the position of the detected object in the ground reference frame.
+ 
+    @param   robot_centroid      -> List representing the centroid coordinates of the robot
+             robot_direction    -> Tuple representing the direction vector coordinates of the robot
+             prox_sensors       -> List representing the values reported by the proximity sensors
+    
+    @return  object_ground_coords -> List representing the coordinates of the detected object in the ground reference frame, or None if no object is detected
+    '''
+    
+    object_ground_coords = None
+    
+    # Continue advancing until an object is detected
+    while object_ground_coords is None:
+        for sensor_index, sensor_value in enumerate(prox_sensors):
+            # Check if an object is detected by the sensor
+            if sensor_value > 0:
+                # Calculate distance and angle based on the sensor index
+                distance = (5739 - sensor_value) / 339
+                angle = [40, 25, 0, -25, -40][sensor_index]
+                
+                # Calculate object coordinates in the robot's reference frame
+                detected_object_coords_robot_frame = [
+                    distance * np.cos(np.radians(angle)),
+                    distance * np.sin(np.radians(angle))
+                ]
+                
+                # Convert object coordinates to the ground reference frame
+                object_ground_coords = object_position_in_ground_frame(robot_centroid, robot_direction, detected_object_coords_robot_frame)
+                
+                # Print the information about the detected object
+                print(f"Object detected by sensor {sensor_index} at coordinates {object_ground_coords}")
+                
+                # Break the loop as soon as an object is detected
+                break
+        
+        # If no object is detected, continue advancing (you can replace this with your own advance logic)
+        if object_ground_coords is None:
+            print("No object detected. Continue advancing.")
+            # Add your logic for advancing here
+    
+    return object_ground_coords
 
-
+--------------------------------------------------------------------
 
 
 
