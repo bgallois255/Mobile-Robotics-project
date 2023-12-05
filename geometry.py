@@ -12,22 +12,20 @@ def center_angle(angle):
     Parameter: - angle: angle to be centered in [rad]
     Return: - angle: centered angle in [rad]
     '''
-    while(angle > math.pi or angle <= - math.pi):
-        if(angle > math.pi):
-            angle -= 2*math.pi
-        elif(angle <= - math.pi):
-            angle += 2*math.pi
-
+    while angle <= -math.pi:
+        angle += 2 * math.pi
+    while angle > math.pi:
+        angle -= 2 * math.pi
     return angle
-
+'''
 def arctan(x, y):
-    '''
+    ''''''
     compute the arctangent from x over y
 
     Parameter: - x: adjacent in [mm]
                - y: opposite in [mm]
     Return: - angle: angle between -pi and pi in [rad]
-    '''
+    ''''''
     if(y == 0):         # avoid division by 0
         if(x < 0):
             angle = math.pi
@@ -48,3 +46,4 @@ def arctan(x, y):
     return angle
 
 print(arctan(0,-1))
+'''
