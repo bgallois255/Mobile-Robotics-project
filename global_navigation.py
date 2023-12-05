@@ -132,8 +132,8 @@ def visualize_workspace(vertices, obstacles, p_robot, p_goal, edges, graph, shor
 
     plt.figure(figsize=(10, 10))
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.xlim(-1, 20)
-    plt.ylim(-1, 15)
+    plt.xlim(0, 1920)
+    plt.ylim(0, 1080)
 
     for i, obstacle in enumerate(obstacles):
         # Extract the exterior coordinates of the obstacle

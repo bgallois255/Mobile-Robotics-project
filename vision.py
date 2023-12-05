@@ -9,8 +9,6 @@ import time
 import numpy as np
 
 # Definition of the colours thresholds
-#LOWER_RED = np.array([0, 70, 50])
-#UPPER_RED = np.array([20, 255, 255])
 
 LOWER_RED = np.array([0, 100, 50])
 UPPER_RED = np.array([15, 255, 255])
@@ -25,10 +23,10 @@ LOWER_BLACK = np.array([0, 0, 0])
 UPPER_BLACK = np.array([179, 255, 30])
 
 # Definition of the size of contours considered as noise
-NOISY_CONTOUR_LENGHT = 1000
+NOISY_CONTOUR_LENGHT = 2000
 
 MARGIN_RED_BLUE_GREEN = 0
-MARGIN_OBSTACLE = 50
+MARGIN_OBSTACLE = 0
 
 
 def detect_area(image, lower_colour, upper_colour, margin):
@@ -49,8 +47,8 @@ def detect_area(image, lower_colour, upper_colour, margin):
             x, y, w, h = cv2.boundingRect(contour)
             x_with_margin = max(0, x - margin)
             y_with_margin = max(0, y - margin)
-            w_with_margin = min(width, w + 2 * margin)
-            h_with_margin = min(height, h + 2 * margin)
+            w_with_margin = min(width - x_with_margin, w + 2 * margin)
+            h_with_margin = min(height - y_with_margin, h + 2 * margin)
 
             coords.append([(x_with_margin, height - y_with_margin),
                            (x_with_margin + w_with_margin, height - y_with_margin),
@@ -80,8 +78,7 @@ def vision_obstacles_and_goal():
         print("Erreur: Impossible d'ouvrir la webcam.")
         return
 
-    ret, frame = cap.read()
-    time.sleep(2)
+    time.sleep(1)
     ret, frame = cap.read()
     
     if not ret:
@@ -100,6 +97,7 @@ def vision_obstacles_and_goal():
     
     return obstacles, goal_centroid
 
+
 def vision_robot():
     cap = cv2.VideoCapture(0)
 
@@ -107,6 +105,7 @@ def vision_robot():
         print("Erreur: Impossible d'ouvrir la webcam.")
         return
 
+    time.sleep(1)
     ret, frame = cap.read()
     
     if not ret:
@@ -124,9 +123,3 @@ def vision_robot():
     print("Centroid du robot :", robot_centroid)
     
     return robot_centroid, robot_direction
-
-
-#obst, goal = vision_obstacles_and_goal()
-
-#while True:
-#    robot = vision_robot()
