@@ -82,7 +82,7 @@ def visibility_graph(p_robot, obstacles, p_goal):
             if i != j:
                 line = LineString([vertex1, vertex2])
 
-                intersects_obstacle = any(line.crosses(Polygon(obstacle)) or line.within(Polygon(obstacle)) for obstacle in obstacles if not line.touches(Polygon(obstacle)))
+                intersects_obstacle = any(line.crosses(Polygon(obstacle)) or (line.within(Polygon(obstacle)) and i!=0) for obstacle in obstacles if not line.touches(Polygon(obstacle)))
 
 
                 if not intersects_obstacle:
