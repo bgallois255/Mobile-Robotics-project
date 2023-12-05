@@ -32,9 +32,9 @@ class Kalman():
                             [0.0]])     # vl, left wheel velocity : at initialization the robot is not moving
 
         # state noise variances (experimental values)
-        self.q_x     = 0.1
-        self.q_y     = 0.1 
-        self.q_theta = 0.1
+        self.q_x     = 0.01
+        self.q_y     = 0.01 
+        self.q_theta = 0.001
         self.q_vr    = 8.318/2.0    # we assume that the speed variance is half caused by measurement
         self.q_vl    = 8.318/2.0    # and half by perturbation as seen in the exercise 8
 
@@ -67,9 +67,9 @@ class Kalman():
         self.position_camera = True     # at initialization the camera gives the robot position
         
         # measurement noise variances (experimental values)
-        self.r_x     = 0.1
-        self.r_y     = 0.1
-        self.r_theta = 0.1
+        self.r_x     = 0.01
+        self.r_y     = 0.01
+        self.r_theta = 0.001
         self.r_vr    = self.q_vr    # we assume that the speed variance is half caused by measurement 
         self.r_vl    = self.q_vl    # and half by perturbation as seen in the exercise 8
 
