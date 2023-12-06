@@ -208,28 +208,24 @@ def visualize_workspace(vertices, obstacles, p_robot, p_goal, edges, graph, shor
 
     
     
-def global_navigation(p_robot, obstacles, p_goal, merge_need, visualize):
+def global_navigation(p_robot, obstacles, p_goal):
     '''
     @brief   Implements the dijkstra, visibility_graph, merge_overlapping and visualize_workspace functions to solve the global              navigation problem and visualize the solution
 
     @param   p_robot         -> Tuple, robot position coordinates
              obstacles       -> List of lists of organized coordinate tuples indicating the succesive corners (clockwise or                                     anticlockwise order) of the safe zones corresponding to each obstacles
              p_goal          -> Tuple, goal position coordinates
-             merge_need      -> Boolean: TRUE if we want to recheck the overlapping of obstacles
-             visualize       -> Boolean: TRUE if visualization is needed
-
+             
     @return  shortest_path   -> List of coordinates tuples indicating the successive vertices to pass by in order to go from                                   initial to goal position by travelling the shortest distance
              obstacles       -> Updated list of obstacles with possibly a shortest length, ensuring all obstacles are distinct                                 from each other (but they can touch as long as they don't overlap)
     '''
     
-    if(merge_need):
-        obstacles = merge_overlapping_obstacles(obstacles)
+    obstacles = merge_overlapping_obstacles(obstacles)
         
     graph, edges = visibility_graph(p_robot, obstacles, p_goal)
     shortest_path = dijkstra(graph, p_robot, p_goal)
     
-    if(visualize):
-        visualize_workspace([p_robot, p_goal] + sum(obstacles, []), [Polygon(obs) for obs in obstacles],
-                    p_robot, p_goal, edges, graph, shortest_path)
+    visualize_workspace([p_robot, p_goal] + sum(obstacles, []), [Polygon(obs) for obs in obstacles],
+                         p_robot, p_goal, edges, graph, shortest_path)
         
     return shortest_path, obstacles
