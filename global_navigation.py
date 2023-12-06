@@ -14,6 +14,11 @@ from matplotlib.legend_handler import HandlerTuple
 from shapely.geometry import Point, Polygon, LineString, MultiPolygon
 #======================================================================
 
+IMAGE_SHAPE_X = 1920
+IMAGE_SHAPE_Y = 1080
+
+#======================================================================
+
 def dijkstra(graph, start, goal):
     '''
     @brief   Implements the dijkstra algorithm to find the shortest path from the robot position to the goal position, only                  travelling from vertex to vertex.
@@ -158,8 +163,8 @@ def visualize_workspace(vertices, obstacles, p_robot, p_goal, edges, graph, shor
 
     plt.figure(figsize=(10, 10))
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.xlim(0, 1920)
-    plt.ylim(0, 1080)
+    plt.xlim(0, IMAGE_SHAPE_X)
+    plt.ylim(0, IMAGE_SHAPE_Y)
 
     for i, obstacle in enumerate(obstacles):
         # Extract the exterior coordinates of the obstacle
