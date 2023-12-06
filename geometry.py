@@ -47,3 +47,20 @@ def arctan(x, y):
 
 print(arctan(0,-1))
 '''
+
+
+
+def is_inside(point, obstacles):
+    for obstacle in range(len(obstacles)):
+        min_x = min(s[0] for s in obstacles[obstacle])
+        max_x = max(s[0] for s in obstacles[obstacle])
+        min_y = min(s[1] for s in obstacles[obstacle])
+        max_y = max(s[1] for s in obstacles[obstacle])
+        for summit in range(len(obstacles[obstacle])):
+            if min_x <= point[0] <= max_x and min_y <= point[1] <= max_y:
+                return True
+    return False
+
+obstacles = [[(1,2), (1,3), (2, 2), (2,3)],[(4,5), (6,7), (4,7), (6,5)]]
+point = (1.1, 2.2)
+print(is_inside(point, obstacles))
