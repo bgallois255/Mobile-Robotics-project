@@ -99,3 +99,23 @@ def safety_zone(center_point):
     
     return [corner1, corner2, corner3, corner4]
 
+
+def is_inside(point, obstacles):
+    '''
+    @brief   When it detects an obstacle, it checks if it has not been already detected
+
+    @param   point           -> List of the coordinates of the center of the new obstacle
+             obstacles       -> List of coordinates of the obstacles on the map
+             
+    @return  boolean
+    '''
+    for obstacle in range(len(obstacles)):
+        min_x = min(s[0] for s in obstacles[obstacle])
+        max_x = max(s[0] for s in obstacles[obstacle])
+        min_y = min(s[1] for s in obstacles[obstacle])
+        max_y = max(s[1] for s in obstacles[obstacle])
+        for summit in range(len(obstacles[obstacle])):
+            if min_x <= point[0] <= max_x and min_y <= point[1] <= max_y:
+                return True
+    return False
+
