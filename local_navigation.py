@@ -78,13 +78,14 @@ def safety_zone(center_point):
     '''
     
     # Distance from the center point to the corners
-    distance = 5
+    distance1 = 10
+    distance2 = 12
     
     # Calculate coordinates of the four corners
-    corner1 = (center_point[0] + distance, center_point[1] + distance)
-    corner2 = (center_point[0] + distance, center_point[1] - distance)
-    corner3 = (center_point[0] - distance, center_point[1] - distance)
-    corner4 = (center_point[0] - distance, center_point[1] + distance)
+    corner1 = (center_point[0] + distance1, center_point[1] + distance2)
+    corner2 = (center_point[0] + distance1, center_point[1] - distance2)
+    corner3 = (center_point[0] - distance1, center_point[1] - distance2)
+    corner4 = (center_point[0] - distance1, center_point[1] + distance2)
     
     return [corner1, corner2, corner3, corner4]
 
@@ -96,9 +97,9 @@ def local_nav(robot_centroid, robot_direction, prox_sensors):
     return Object
 
 
-prox_sensors = [0, 2500, 0, 0, 0]
-robot_centroid = [200,-401.8]
-robot_direction = (-1,-2)
+prox_sensors = [0,0, 2500, 0, 0]
+robot_centroid = [0,0]
+robot_direction = (0,1)
 object_robot_coords = object_robot_coordinates(prox_sensors)
 print("object_robot_coords")
 print(object_robot_coords)
