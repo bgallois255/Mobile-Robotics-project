@@ -29,7 +29,7 @@ NOISY_CONTOUR_LENGHT = 2000
 
 # Margin sizes
 MARGIN_RED_BLUE_GREEN = 0
-MARGIN_OBSTACLE = 120
+MARGIN_OBSTACLE = 140
 
 #==================================================================
 
@@ -114,25 +114,11 @@ def vision_obstacles_and_goal(frame):
     '''
     @brief   Open the camera and compute the obstacles and the goal coordinates.
     
+    @param   frame           -> Image capture from the webcam
+    
     @return  obstacles       -> List that represents the vertices of the obstacles coordinates
              goal_centroid   -> List of coordinates of the goal centroid
     '''
-    
-    # Open camera
-    #cap = cv2.VideoCapture(0)
-
-    #if not cap.isOpened():
-       # print("Erreur: Impossible d'ouvrir la webcam.")
-       # return
-
-    #time.sleep(2)
-    #ret, frame = cap.read()
-    
-   # if not ret:
-        #print("Erreur: Impossible de capturer l'image.")
-        #return
-
-    #cv2.imshow('Webcam', frame)
 
     obstacles = detect_area(frame, LOWER_BLACK, UPPER_BLACK, MARGIN_OBSTACLE)
     goal_area = detect_area(frame, LOWER_RED, UPPER_RED, MARGIN_RED_BLUE_GREEN)
@@ -149,24 +135,10 @@ def vision_robot(frame):
     '''
     @brief   Open the camera and compute the robot coordinates and direction.
     
+    @param   frame             -> Image capture from the webcam
+    
     @return  robot_centroid    -> List of the coordinates of the robot centroid
              robot_direction   -> Tuple of the robot direction (x,y)
-    '''
-    '''
-    cap = cv2.VideoCapture(0)
-
-    if not cap.isOpened():
-        print("Erreur: Impossible d'ouvrir la webcam.")
-        return
-
-    time.sleep(2)
-    ret, frame = cap.read()
-    
-    if not ret:
-        print("Erreur: Impossible de capturer l'image.")
-        return
-
-    cv2.imshow('Webcam', frame)
     '''
     
     front_robot_area = detect_area(frame, LOWER_BLUE, UPPER_BLUE, MARGIN_RED_BLUE_GREEN)

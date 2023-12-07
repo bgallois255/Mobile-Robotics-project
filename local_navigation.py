@@ -22,7 +22,7 @@ ANGLE_CAPTEUR_3 = 0
 
 # Margin size around the obstacle
 MARGIN_X = 10
-MARGIN_Y = 10
+MARGIN_Y = 12
 
 #==================================================================
 
