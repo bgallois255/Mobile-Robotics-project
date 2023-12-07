@@ -124,11 +124,11 @@ class Kalman():
         vr = self.Mu[3][0]          # right wheel velocity in [mm/s]
         vl = self.Mu[4][0]          # left  wheel velocity in [mm/s]
 
-        A = np.array([[1, 0, 0, self.dt*math.cos(theta)/2  , self.dt*math.cos(theta)/2   ],
-                      [0, 1, 0, self.dt*math.sin(theta)/2  , self.dt*math.sin(theta)/2   ],
+        A = np.array([[1, 0, 0, self.dt*math.cos(theta)/2            , self.dt*math.cos(theta)/2             ],
+                      [0, 1, 0, self.dt*math.sin(theta)/2            , self.dt*math.sin(theta)/2             ],
                       [0, 0, 1, self.dt*ROTATION_CORR/(4*WHEELS_DIST), -self.dt*ROTATION_CORR/(4*WHEELS_DIST)], 
-                      [0, 0, 0, 0                          , 0                           ],
-                      [0, 0, 0, 0                          , 0                           ]])
+                      [0, 0, 0, 0                                    , 0                                     ],
+                      [0, 0, 0, 0                                    , 0                                     ]])
         
         G = A + np.diag([0,0,0,1,1])
         G[0][2] = self.dt*math.sin(theta)*(vr+vl)/2
