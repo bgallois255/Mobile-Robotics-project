@@ -17,12 +17,12 @@ CONSTANT_B = 339
 
 # Angle of the different proximity sensors
 ANGLE_CAPTEUR_1 = 40
-ANGLE_CAPTEUR_2 = 20
+ANGLE_CAPTEUR_2 = 25
 ANGLE_CAPTEUR_3 = 0
 
 # Margin size around the obstacle
 MARGIN_X = 10
-MARGIN_Y = 15
+MARGIN_Y = 10
 
 #==================================================================
 
