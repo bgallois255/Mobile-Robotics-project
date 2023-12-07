@@ -10,8 +10,10 @@ import numpy as np
 import math
 #==================================================================
 
-WHEELS_DIST = 93                        # distance between the wheels of Thymio in [mm]
-ROTATION_CORR = 27                       # correction factor for rotations
+WHEELS_DIST = 93                               # distance between the wheels of Thymio in [mm]
+ROTATION_CORR_LEFT = 25                        # correction factor for rotations
+ROTATION_CORR_RIGHT = 50                       # correction factor for rotations
+TRANSLATION_CORR = 0.35
 
 #==================================================================
 
@@ -124,15 +126,15 @@ class Kalman():
         vr = self.Mu[3][0]          # right wheel velocity in [mm/s]
         vl = self.Mu[4][0]          # left  wheel velocity in [mm/s]
 
-        A = np.array([[1, 0, 0, self.dt*math.cos(theta)/2  , self.dt*math.cos(theta)/2   ],
-                      [0, 1, 0, self.dt*math.sin(theta)/2  , self.dt*math.sin(theta)/2   ],
-                      [0, 0, 1, self.dt*ROTATION_CORR/(4*WHEELS_DIST), -self.dt*ROTATION_CORR/(4*WHEELS_DIST)], 
+        A = np.array([[1, 0, 0, self.dt*TRANSLATION_CORR*math.cos(theta)/2  , self.dt*TRANSLATION_CORR*math.cos(theta)/2   ],
+                      [0, 1, 0, self.dt*TRANSLATION_CORR*math.sin(theta)/2  , self.dt*TRANSLATION_CORR*math.sin(theta)/2   ],
+                      [0, 0, 1, self.dt*ROTATION_CORR_RIGHT/(4*WHEELS_DIST), -self.dt*ROTATION_CORR_LEFT/(4*WHEELS_DIST)], 
                       [0, 0, 0, 0                          , 0                           ],
                       [0, 0, 0, 0                          , 0                           ]])
         
         G = A + np.diag([0,0,0,1,1])
-        G[0][2] = self.dt*math.sin(theta)*(vr+vl)/2
-        G[1][2] = -self.dt*math.cos(theta)*(vr+vl)/2
+        G[0][2] = self.dt*TRANSLATION_CORR*math.sin(theta)*(vr+vl)/2
+        G[1][2] = -self.dt*TRANSLATION_CORR*math.cos(theta)*(vr+vl)/2
 
         return A,G
    

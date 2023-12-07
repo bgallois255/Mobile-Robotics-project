@@ -65,7 +65,7 @@ def dijkstra(graph, start, goal):
 
 
 
-def visibility_graph(p_robot, obstacles, p_goal):
+def visibility_graph(p_robot, obstacles, p_goal, bounds):
     '''
     @brief   Creates the graph of the virtual environment by first generating a list of all vertices (robot, goal or obstacle                corner) in the environment.
              Then, it creates a list of all edges not intersecting with any obstacle, meaning it only contains the fully                    visible ones. 
@@ -74,21 +74,34 @@ def visibility_graph(p_robot, obstacles, p_goal):
     @param   p_robot      -> Tuple of the robot position coordinates
              obstacles    -> List of lists of organized coordinate tuples indicating the succesive corners (clockwise or                                    anticlockwise order) of the safe zones corresponding to each obstacles 
              p_goal       -> Tuple of the goal position coordinates
+             bounds       -> List of coordinates tuples defining the whole rectangular area on which the robot can move by giving                              the corners of the area in order (if the robot goes anywhere outside he wouldn't be detected by the                              camera)
                  
 
     @return  graph        -> Dictionnary of each vertices connected to a list of tuples containing the coordinates of each                                  vertices it can connect to, along with the length of the path to that vertex
              edges        -> List of tuples of tuples: each tuple is a visible edge, containing two coordinate tuples                                        indicating its start and finsish coordinates
     '''
     
+    if (not (Point(p_robot).within(Polygon(bounds)) or Point(p_robot).touches(Polygon(bounds))) or not (Point(p_goal).within(Polygon(bounds)) or Point(p_goal).touches(Polygon(bounds)))):
+        print("Robot or goal centroids not within bounds")
+        return "Robot or goal centroids not within bounds", obstacles
+        
     all_vertices = [p_robot, p_goal]
 
     for obstacle in obstacles:
         all_vertices.extend(obstacle)
 
+    print("vertices de base : ", all_vertices)
+
     # Remove duplicates while preserving order
     all_vertices = list(dict.fromkeys(all_vertices))
+    print("vertices sans doublon : ", all_vertices)
+
+    # Remove out of bounds vertices
+    all_vertices = [vertex for vertex in all_vertices if (Point(vertex).within(Polygon(bounds)) or Point(vertex).touches(Polygon(bounds)))]
+    print("vertices sans doublon ni out of bounds : ", all_vertices)
 
     edges = []
+
 
     # Fills the edges list with all edges that do not intersect with any obstacle
     for i, vertex1 in enumerate(all_vertices):
@@ -96,7 +109,8 @@ def visibility_graph(p_robot, obstacles, p_goal):
             if i != j:
                 line = LineString([vertex1, vertex2])
 
-                intersects_obstacle = any(line.crosses(Polygon(obstacle)) or (line.within(Polygon(obstacle)) and i!=0) for                                               obstacle in obstacles if not line.touches(Polygon(obstacle)))
+                #intersects_obstacle = any(line.crosses(Polygon(obstacle)) or line.within(Polygon(obstacle)) for obstacle in obstacles if not line.touches(Polygon(obstacle)))
+                intersects_obstacle = any(line.crosses(Polygon(obstacle)) or (line.within(Polygon(obstacle)) and i!=0) for obstacle in obstacles if not line.touches(Polygon(obstacle)))
 
                 if not intersects_obstacle:
                     edges.append((vertex1, vertex2))
@@ -105,21 +119,17 @@ def visibility_graph(p_robot, obstacles, p_goal):
 
     # Convert edges to a dictionary representation of the graph
     graph = {}
-    
     for edge in edges:
         edge = (tuple(map(float, edge[0])), tuple(map(float, edge[1])))
-        
         if edge[0] not in graph:
             graph[edge[0]] = []
-            
         graph[edge[0]].append((edge[1], np.linalg.norm(np.array(edge[0]) - np.array(edge[1]))))
-        
         if edge[1] not in graph:
             graph[edge[1]] = []
-            
         graph[edge[1]].append((edge[0], np.linalg.norm(np.array(edge[0]) - np.array(edge[1]))))
 
     return graph, edges
+
 
 
 
@@ -208,13 +218,15 @@ def visualize_workspace(vertices, obstacles, p_robot, p_goal, edges, graph, shor
 
     
     
-def global_navigation(p_robot, obstacles, p_goal):
+def global_navigation(p_robot, obstacles, p_goal, bounds):
     '''
     @brief   Implements the dijkstra, visibility_graph, merge_overlapping and visualize_workspace functions to solve the global              navigation problem and visualize the solution
 
     @param   p_robot         -> Tuple, robot position coordinates
              obstacles       -> List of lists of organized coordinate tuples indicating the succesive corners (clockwise or                                     anticlockwise order) of the safe zones corresponding to each obstacles
              p_goal          -> Tuple, goal position coordinates
+             bounds          -> List of coordinate tuples defining the whole rectangular area on which the robot can move by                                     giving the corners of the area in order (if the robot goes anywhere outside he wouldn't be                                       detected by the camera)
+             
              
     @return  shortest_path   -> List of coordinates tuples indicating the successive vertices to pass by in order to go from                                   initial to goal position by travelling the shortest distance
              obstacles       -> Updated list of obstacles with possibly a shortest length, ensuring all obstacles are distinct                                 from each other (but they can touch as long as they don't overlap)
@@ -222,7 +234,7 @@ def global_navigation(p_robot, obstacles, p_goal):
     
     obstacles = merge_overlapping_obstacles(obstacles)
         
-    graph, edges = visibility_graph(p_robot, obstacles, p_goal)
+    graph, edges = visibility_graph(p_robot, obstacles, p_goal, bounds)
     shortest_path = dijkstra(graph, p_robot, p_goal)
     
     visualize_workspace([p_robot, p_goal] + sum(obstacles, []), [Polygon(obs) for obs in obstacles],
