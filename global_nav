@@ -52,11 +52,21 @@ def dijkstra(graph, start, goal):
 
 
 
-def visibility_graph(p_robot, obstacles, p_goal):
+
+
+
+
+
+
+
+
+
+def visibility_graph(p_robot, obstacles, p_goal, bounds):
     """
     @parameters: -p_robot: tuple, robot position coordinates
                  -obstacles: a list of lists of organized coordinate tuples indicating the succesive corners (clockwise or anticlockwise order) of the safe zones corresponding to each obstacles detected by the vision algorithm
                  -p_goal: tuple, goal position coordinates
+                 -bounds: list of coordinate tuples defining the whole rectangular area on which the robot can move by giving the corners of the area in order (if the robot goes anywhere outside he wouldn't be detected by the camera)
                  
 
     @description: the function creates the graph of the virtual environment by first generating a list of all vertices (robot, goal or obstacle corner) in the environment.
@@ -65,13 +75,26 @@ def visibility_graph(p_robot, obstacles, p_goal):
     @exit: -graph: a dictionnary having entries for each vertex of the environment connected to a list of tuples containing the coordinates of each vertex it can connect to, along with the length of the path to that vertex
            -edges: list of tuples of tuples: each tuple is a visible edge, containing two coordinate tuples indicating its start and finsish coordinates
     """
+    
+
+    if (not (Point(p_robot).within(Polygon(bounds)) or Point(p_robot).touches(Polygon(bounds))) or not (Point(p_goal).within(Polygon(bounds)) or Point(p_goal).touches(Polygon(bounds)))):
+        print("Robot or goal centroids not within bounds")
+        return "Robot or goal centroids not within bounds", obstacles
+        
     all_vertices = [p_robot, p_goal]
 
     for obstacle in obstacles:
         all_vertices.extend(obstacle)
 
+    print("vertices de base : ", all_vertices)
+
     # Remove duplicates while preserving order
     all_vertices = list(dict.fromkeys(all_vertices))
+    print("vertices sans doublon : ", all_vertices)
+
+    # Remove out of bounds vertices
+    all_vertices = [vertex for vertex in all_vertices if (Point(vertex).within(Polygon(bounds)) or Point(vertex).touches(Polygon(bounds)))]
+    print("vertices sans doublon ni out of bounds : ", all_vertices)
 
     edges = []
 
@@ -82,8 +105,8 @@ def visibility_graph(p_robot, obstacles, p_goal):
             if i != j:
                 line = LineString([vertex1, vertex2])
 
+                #intersects_obstacle = any(line.crosses(Polygon(obstacle)) or line.within(Polygon(obstacle)) for obstacle in obstacles if not line.touches(Polygon(obstacle)))
                 intersects_obstacle = any(line.crosses(Polygon(obstacle)) or (line.within(Polygon(obstacle)) and i!=0) for obstacle in obstacles if not line.touches(Polygon(obstacle)))
-
 
                 if not intersects_obstacle:
                     edges.append((vertex1, vertex2))
@@ -102,6 +125,16 @@ def visibility_graph(p_robot, obstacles, p_goal):
         graph[edge[1]].append((edge[0], np.linalg.norm(np.array(edge[0]) - np.array(edge[1]))))
 
     return graph, edges
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -124,6 +157,18 @@ def merge_overlapping_obstacles(obstacles):
     return [list(polygon.exterior.coords) for polygon in polygons]
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 def visualize_workspace(vertices, obstacles, p_robot, p_goal, edges, graph, shortest_path=None):
     """
     @description: this function simply plots the results in the virtual environment
@@ -132,9 +177,19 @@ def visualize_workspace(vertices, obstacles, p_robot, p_goal, edges, graph, shor
 
     plt.figure(figsize=(10, 10))
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.xlim(-1, 20)
-    plt.ylim(-1, 15)
+    """
+    xmin = min(vertices[:][0])
+    print("xmin:",xmin)
+    xmax = max(vertices[:][0])
+    print("xmax:", xmax)
+    ymin = min(vertices[:][1])
+    print("ymin:", ymin)
+    ymax = max(vertices[:][1])
+    print("ymax:", ymax)
 
+    plt.xlim(xmin - 0.1*(xmax - xmin), xmax + 0.1*(xmax-xmin))
+    plt.ylim(ymin - 0.1*(ymax - ymin), ymax + 0.1*(ymax-ymin))
+"""
     for i, obstacle in enumerate(obstacles):
         # Extract the exterior coordinates of the obstacle
         obstacle_array = np.array(obstacle.exterior.xy).T
@@ -182,6 +237,7 @@ def global_navigation(p_robot, obstacles, p_goal, merge_need, visualize):
     @parameters: -p_robot: tuple, robot position coordinates
                  -obstacles: a list of lists of organized coordinate tuples indicating the succesive corners (clockwise or anticlockwise order) of the safe zones corresponding to each obstacles detected by the vision algorithm
                  -p_goal: tuple, goal position coordinates
+                 -bounds: list of coordinate tuples defining the whole rectangular area on which the robot can move by giving the corners of the area in order (if the robot goes anywhere outside he wouldn't be detected by the camera)
                  -merge_need: Boolean, true if we want to recheck the overlapping of obstacles (if we have added an obstacle for instance)
                  -visualize: Boolean, true if visualization is needed
                  
@@ -193,8 +249,9 @@ def global_navigation(p_robot, obstacles, p_goal, merge_need, visualize):
     """
     if(merge_need):
         obstacles = merge_overlapping_obstacles(obstacles)
-    graph, edges = visibility_graph(p_robot, obstacles, p_goal)
+    graph, edges = visibility_graph(p_robot, obstacles, p_goal, bounds)
     shortest_path = dijkstra(graph, p_robot, p_goal)
+    print([p_robot, p_goal] + sum(obstacles, []))
     if(visualize):
         visualize_workspace([p_robot, p_goal] + sum(obstacles, []), [Polygon(obs) for obs in obstacles],
                     p_robot, p_goal, edges, graph, shortest_path)
@@ -256,10 +313,22 @@ obstacles = [
 ]
 obstacles.append([(5,3.5),(5,4.5),(6,4.5),(6,3.5)])
 obstacles.append([(5,5.5),(5,6.5),(6,6.5),(6,5.5)])
-""""""
+"""
+"""
+#Actual test from the camera
+p_robot = (300,0)
+p_goal = (1750,500)
+obstacles = [[(1336, 216), (1540, 216), (1540, -50), (1336, -50)], [(206, 227), (691, 227), (691, -46), (206, -46)], [(1626, 375), (1859, 375), (1859, 85), (1626, 85)], [(966, 419), (1235, 419), (1235, -50), (966, -50)], [(1578, 1080), (1970, 1080), (1970, 643), (1578, 643)]]
+bounds = [(0,0), (0, 1080), (1960,1080),(1960,0)]
+"""
+"""
+p_robot = (0,0)
+p_goal = (10,0)
+obstacles = [[(4, -1), (4, 5), (5, 5), (5, -1)], [(4, 5), (4, 6), (5, 6), (5, 5)]]
+bounds = [(0,0), (0, 10), (10,10),(10,0)]
 
-p_goal = (8,4)
+
 st = time.time()
-shortest_path , obstacles = global_navigation(p_robot, obstacles, p_goal, merge_need=True, visualize=False) 
-print("soltution : ", shortest_path)
-print("Execution time : ", time.time() - st)"""
+shortest_path , obstacles = global_navigation(p_robot, obstacles, p_goal, merge_need=True, visualize=True) 
+print("soltution : ", shortest_path)"""
+print("Execution time : ", time.time() - st)
