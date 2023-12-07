@@ -29,7 +29,7 @@ NOISY_CONTOUR_LENGHT = 2000
 
 # Margin sizes
 MARGIN_RED_BLUE_GREEN = 0
-MARGIN_OBSTACLE = 140
+MARGIN_OBSTACLE = 180
 
 #==================================================================
 
